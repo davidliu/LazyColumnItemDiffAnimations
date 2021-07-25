@@ -1,6 +1,7 @@
 package io.livekit.itemdiffs
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,11 +45,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
@@ -72,24 +69,29 @@ fun MainContent() {
         uuids.value = uuids.value.minus(uuid)
     }
 
+    fun removeFirst() {
+        if(uuids.value.isEmpty()) {
+            return
+        }
+        uuids.value = uuids.value.subList(1, uuids.value.size)
+    }
+
     Box(
         Modifier
             .background(Color(0xFFEDEAE0))
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        val animationState = updateAnimatedItemsState(targetState = uuids.value)
-        LazyColumn(
-            Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            animatedItemsIndexed(animationState, key = { item: String -> item }) { _, item ->
+        val animationState by updateAnimatedItemsState(uuids.value)
+        LazyColumn(Modifier.fillMaxSize()) {
+            animatedItemsIndexed(animationState, key = { it }) { _, item ->
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight(
                             align = Alignment.CenterVertically
-                        ),
+                        )
+                        .padding(vertical = 4.dp),
                     color = Color.Black,
                     elevation = 4.dp,
                 ) {
@@ -132,68 +134,12 @@ fun MainContent() {
             Modifier.align(Alignment.BottomEnd),
             backgroundColor = Color(0xFFFE4164)
         ) { Icon(Icons.Filled.Add, "") }
+        FloatingActionButton(
+            onClick = {
+                removeFirst()
+            },
+            Modifier.align(Alignment.BottomStart),
+            backgroundColor = Color(0xFFFE4164)
+        ) { Icon(Icons.Filled.Close, "") }
     }
 }
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun AnimatedVisibilityLazyColumnDemo() {
-    var itemNum by remember { mutableStateOf(0) }
-    Column {
-        Row(Modifier.fillMaxWidth()) {
-            Button(
-                { itemNum += 1 },
-                enabled = itemNum <= turquoiseColors.size - 1,
-                modifier = Modifier
-                    .padding(15.dp)
-                    .weight(1f)
-            ) {
-                Text("Add")
-            }
-
-            Button(
-                { itemNum -= 1 },
-                enabled = itemNum >= 1,
-                modifier = Modifier
-                    .padding(15.dp)
-                    .weight(1f)
-            ) {
-                Text("Remove")
-            }
-        }
-        LazyColumn {
-            itemsIndexed(turquoiseColors) { i, color ->
-                AnimatedVisibility(
-                    (turquoiseColors.size - itemNum) <= i,
-                    enter = expandVertically(),
-                    exit = shrinkVertically()
-                ) {
-                    Spacer(
-                        Modifier
-                            .fillMaxWidth()
-                            .requiredHeight(90.dp)
-                            .background(color)
-                    )
-                }
-            }
-        }
-
-        Button(
-            { itemNum = 0 },
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(15.dp)
-        ) {
-            Text("Clear All")
-        }
-    }
-}
-
-private val turquoiseColors = listOf(
-    Color(0xff07688C),
-    Color(0xff1986AF),
-    Color(0xff50B6CD),
-    Color(0xffBCF8FF),
-    Color(0xff8AEAE9),
-    Color(0xff46CECA)
-)

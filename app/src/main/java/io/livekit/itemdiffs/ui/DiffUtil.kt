@@ -4,9 +4,7 @@ import androidx.recyclerview.widget.DiffUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-suspend fun <T> calculateDiff(
-    oldList: List<T>,
-    newList: List<T>,
+suspend fun calculateDiff(
     detectMoves: Boolean = true,
     diffCb: DiffUtil.Callback
 ): DiffUtil.DiffResult {
