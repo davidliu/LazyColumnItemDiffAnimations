@@ -1,6 +1,9 @@
+
 # LazyColumnItemDiffAnimations
 
 An experimental method for providing item diff animations in a LazyColumn. Note that this only handles additions and removals, not moves.
+
+![ezgif-4-c97be879c5b6](https://user-images.githubusercontent.com/242400/126921565-cdc22340-2c6e-4687-8352-12d9cc64d8f1.gif)
 
 ````
 inline fun <T> LazyListScope.animatedItemsIndexed(
